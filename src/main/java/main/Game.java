@@ -12,15 +12,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class Game {
     public static void main(String[] args) {
         JFrame window = new JFrame();
-        GamePanel panel = new GamePanel();
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setLocationRelativeTo(null);
-        window.setTitle("Cloud Game");
-        window.setResizable(false);
-        window.setVisible(true);
-        window.add(panel);
-        window.pack();
-        panel.startGameThread();
+        GamePanel gP = new GamePanel();
 
         try {
             Dotenv dotenv = Dotenv.configure().directory("./src").load();
@@ -31,7 +23,15 @@ public class Game {
             Socket socket = new Socket("127.0.0.1", 5555);
             Client client = new Client(socket, user, pass);
             if (client.authenticate()) {
-                System.out.println("Authentication correct, you enter the chat.");
+                System.out.println("Authenticated, starting the game.");
+                window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                window.setLocationRelativeTo(null);
+                window.setTitle("Cloud Game");
+                window.setResizable(false);
+                window.setVisible(true);
+                window.add(gP);
+                window.pack();
+                gP.startGameThread();
                 client.getMsg();
                 client.sendMsg();
             } else {
