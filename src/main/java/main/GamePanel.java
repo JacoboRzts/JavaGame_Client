@@ -1,5 +1,6 @@
 package main;
 
+import client.Client;
 import entity.Player;
 import tile.TileManager;
 
@@ -8,11 +9,15 @@ import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.net.Socket;
+import java.io.IOException;
 
 /*
  * Mange the main frame of the game
  */
 public class GamePanel extends JPanel implements Runnable {
+    final String user, pass, server;
+    final int port;
     final int originalTileSize = 16;
     final int scale = 3;
     final int tileSize = originalTileSize * scale;
@@ -26,8 +31,15 @@ public class GamePanel extends JPanel implements Runnable {
     TileManager tM = new TileManager(this);
     Player player = new Player(this, kM);
     Thread gameThread;
+    Client client;
+    Socket socket;
 
-    public GamePanel() {
+
+    public GamePanel(String user, String pass, String server, int port) {
+        this.user = user;
+        this.pass = pass;
+        this.server = server;
+        this.port = port;
         this.setPreferredSize(new Dimension(this.widthScreen, this.heightScreen));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
@@ -36,8 +48,22 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void startGameThread() {
-        gameThread = new Thread(this);
-        gameThread.start();
+        try {
+            this.socket = new Socket(server, port);
+            this.client = new Client(socket, user, pass);
+            if(client.authenticate()){
+                System.out.println("Authenticated, starting the game.");
+                gameThread = new Thread(this);
+                gameThread.start();
+            } else {
+                System.out.println("User or password incorrect.");
+                client.cierraTodo();
+            }
+        }
+        catch (IOException e){
+            System.out.println("The server wasn't found.");
+            e.printStackTrace();
+        }
     }
 
     @Override

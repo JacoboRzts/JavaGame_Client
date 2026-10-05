@@ -11,36 +11,20 @@ import io.github.cdimascio.dotenv.Dotenv;
  */
 public class Game {
     public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.configure().directory("./src").load();
+        String user = dotenv.get("USER");
+        String pass = dotenv.get("PASS");
+        String server = dotenv.get("SERVER");
+        int port = Integer.parseInt(dotenv.get("PORT"));
         JFrame window = new JFrame();
-        GamePanel gP = new GamePanel();
-
-        try {
-            Dotenv dotenv = Dotenv.configure().directory("./src").load();
-            String user = dotenv.get("USER");
-            String pass = dotenv.get("PASS");
-            System.out.println("USER: "+ user);
-            System.out.println("PASS: "+ pass);
-            Socket socket = new Socket("127.0.0.1", 5555);
-            Client client = new Client(socket, user, pass);
-            if (client.authenticate()) {
-                System.out.println("Authenticated, starting the game.");
-                window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                window.setLocationRelativeTo(null);
-                window.setTitle("Cloud Game");
-                window.setResizable(false);
-                window.setVisible(true);
-                window.add(gP);
-                window.pack();
-                gP.startGameThread();
-                client.getMsg();
-                client.sendMsg();
-            } else {
-                System.out.println("User or password incorrect.");
-                client.cierraTodo();
-            }
-        } catch (IOException e) {
-            System.out.println("The server wasn't found.");
-            e.printStackTrace();
-        }
+        GamePanel gP = new GamePanel(user, pass, server, port);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setLocationRelativeTo(null);
+        window.setTitle("Cloud Game");
+        window.setResizable(false);
+        window.setVisible(true);
+        window.add(gP);
+        window.pack();
+        gP.startGameThread();
     }
 }
