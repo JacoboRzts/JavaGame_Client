@@ -18,6 +18,7 @@ import java.io.IOException;
 public class GamePanel extends JPanel implements Runnable {
     final String user, pass, server;
     final int port;
+    int lastX, lastY;
     final int originalTileSize = 16;
     final int scale = 3;
     final int tileSize = originalTileSize * scale;
@@ -45,6 +46,8 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(kM);
         this.setFocusable(true);
+        lastX = player.getX();
+        lastY = player.getY();
     }
 
     public void startGameThread() {
@@ -79,6 +82,11 @@ public class GamePanel extends JPanel implements Runnable {
             delta += (actualTime - lastTime) / drawInterval;
             lastTime = actualTime;
             if (delta >= 1){
+                if(lastX != player.getX() || lastY != player.getY()){
+                    client.sendMsg("X: "+player.getX() + " Y:"+player.getY());
+                    lastX = player.getX();
+                    lastY = player.getY();
+                }
                 update();
                 repaint(); // internally call the paintComponent() method to draw into the frame.
                 delta--;

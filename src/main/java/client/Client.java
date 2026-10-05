@@ -39,12 +39,11 @@ public class Client {
         }
     }
 
-    public void sendMsg() {
-        Scanner keyboard = new Scanner(System.in);
+    public void sendMsg(String msg) {
         try {
-            while (socket.isConnected() && !socket.isClosed()) {
-                String msg = keyboard.nextLine();
-                sendMsg.write(user + ": " + msg);
+            if (socket.isConnected() && !socket.isClosed()) {
+                System.out.println(msg);
+                sendMsg.write(msg);
                 sendMsg.newLine();
                 sendMsg.flush();
             }
